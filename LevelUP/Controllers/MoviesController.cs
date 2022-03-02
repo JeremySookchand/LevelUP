@@ -20,6 +20,16 @@ namespace LevelUP.Controllers
         {
             _context.Dispose();
         }
+
+        
+        public ViewResult Index()
+        {
+            if (User.IsInRole(RoleName.CanManageMovies))
+                return View("List");
+
+            return View("ReadOnlyList");
+        }
+        [Authorize(Roles = RoleName.CanManageMovies)]
         public ActionResult MovieForm()
         {
             var genre = _context.Genres.ToList();
@@ -31,6 +41,7 @@ namespace LevelUP.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = RoleName.CanManageMovies)]
         public ActionResult Save(Movie movie)
         {
             if (!ModelState.IsValid)
@@ -63,13 +74,13 @@ namespace LevelUP.Controllers
             return RedirectToAction("Index", "Movies");
         }
 
-        public ViewResult Index()
-        {
-            var movie = _context.Movies.Include(c => c.Genre).ToList();
+    //    public ViewResult Index()
+      //  {
+        //    var movie = _context.Movies.Include(c => c.Genre).ToList();
 
-            return View(movie);
+          //  return View(movie);
 
-        }
+//        }
         public ActionResult Details(int id)
         {
             var movie = _context.Movies.Include(c => c.Genre).SingleOrDefault(c => c.Id == id);
@@ -79,7 +90,7 @@ namespace LevelUP.Controllers
 
             return View(movie);
         }
-
+        [Authorize(Roles = RoleName.CanManageMovies)]
         public ActionResult Edit(int id)
         {
             var movie = _context.Movies.SingleOrDefault(c => c.Id == id);
