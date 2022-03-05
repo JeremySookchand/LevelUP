@@ -22,33 +22,27 @@ namespace LevelUP.Controllers.Api
             _context = new ApplicationDbContext();
         }
         // GET /api/Movies
-       // public IEnumerable<MovieDto> GetMovies(string query = null)
-        //{
-          //  var moviesQuery = _context.Movies
-            //    .Include(m => m.Genre)
-              //  .Where(m => m.NumberAvailable > 0);
-
-            //if (!String.IsNullOrWhiteSpace(query))
-              //  moviesQuery = moviesQuery.Where(m => m.Name.Contains(query));
-
-            //return moviesQuery
-              //  .ToList()
-                //.Select(Mapper.Map<Movie, MovieDto>);
-        //}
-        public IHttpActionResult GetMovie()
+        public IEnumerable<MovieDto> GetMovies(string query = null)
         {
-            //var movie = _context.Movies.SingleOrDefault(c => c.Id == id);
+            var moviesQuery = _context.Movies
+                .Include(m => m.Genre)
+                .Where(m => m.NumberAvailable > 0);
 
-            //            if (movie == null)
-            //              return NotFound();
+            if (!String.IsNullOrWhiteSpace(query))
+                moviesQuery = moviesQuery.Where(m => m.Name.Contains(query));
 
-            //        return Ok(Mapper.Map<Movie, MovieDto>(movie));
-            var movieDtos = _context.Movies
-                      .Include(c => c.Genre)
-                      .ToList()
-                      .Select(Mapper.Map<Movie, MovieDto>);
+            return moviesQuery
+                .ToList()
+                .Select(Mapper.Map<Movie, MovieDto>);
+        }
+        public IHttpActionResult GetMovie(int id)
+        {
+            var movie = _context.Movies.SingleOrDefault(c => c.Id == id);
 
-            return Ok(movieDtos);
+            if (movie == null)
+                return NotFound();
+
+            return Ok(Mapper.Map<Movie, MovieDto>(movie));
         }
 
 

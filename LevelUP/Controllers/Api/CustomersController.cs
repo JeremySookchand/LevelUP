@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Web.Http;
-using AutoMapper;
-using System.Data.Entity;
-using LevelUP.Dtos;
 using LevelUP.Models;
 using System.Web.Routing;
+using LevelUP.Dtos;
+using AutoMapper;
+using System.Data.Entity;
+using System.Web.Http;
+
 
 namespace LevelUP.Controllers.Api
 {
     public class CustomersController : ApiController
     {
-
         private ApplicationDbContext _context;
         public CustomersController()
         {
@@ -23,10 +23,15 @@ namespace LevelUP.Controllers.Api
 
         //get /api/customers/1
 
-        public IHttpActionResult GetCustomer()
+        public IHttpActionResult GetCustomer(string query = null)
         {
-            var customerDtos = _context.Customers
-                .Include(c => c.MembershipType)
+            var customersQuery = _context.Customers
+                .Include(c => c.MembershipType);
+
+                if (!String.IsNullOrWhiteSpace(query))
+                customersQuery = customersQuery.Where(c => c.Name.Contains(query));
+
+            var customerDtos= customersQuery
                 .ToList()
                 .Select(Mapper.Map<Customer, CustomerDto>);
 
@@ -41,7 +46,7 @@ namespace LevelUP.Controllers.Api
             if (!ModelState.IsValid)
                 return BadRequest();
 
-
+               
             var customer = Mapper.Map<CustomerDto, Customer>(customerDto);
 
             _context.Customers.Add(customer);
@@ -50,7 +55,7 @@ namespace LevelUP.Controllers.Api
             customerDto.Id = customer.Id;
             return Created(new Uri(Request.RequestUri + "/" + customer.Id), customerDto);
 
-
+            
         }
 
         //PUT/api/customers/1
@@ -69,7 +74,7 @@ namespace LevelUP.Controllers.Api
 
             Mapper.Map(customerdto, customerInDb);
 
-
+        
             _context.SaveChanges();
 
             return Ok();
@@ -80,7 +85,7 @@ namespace LevelUP.Controllers.Api
         [HttpDelete]
         public IHttpActionResult DeleteCustomer(int id)
         {
-
+       
             var customerInDb = _context.Customers.SingleOrDefault(c => c.Id == id);
 
             if (customerInDb == null)
