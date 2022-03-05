@@ -55,8 +55,8 @@ namespace LevelUP
             //   consumerSecret: "");
 
             app.UseFacebookAuthentication(
-               appId: "3055183461371610",
-               appSecret: "a201bdca12957b8eab28c957f743395d");
+               appId: "",
+               appSecret: "");
 
             //app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
             //{
